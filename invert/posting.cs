@@ -14,7 +14,11 @@ namespace invert
 
         public posting()
         {
-
+            
+        }
+        private string printOut()
+        {
+            return "[" + docID + '\t' + termFreq + '\t' + "{" + string.Join(",", positions) + "}" + "]";
         }
     }
 }
