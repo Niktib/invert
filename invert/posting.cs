@@ -9,14 +9,21 @@ namespace invert
     class posting
     {
         public int docID { get; set; }
-        public int termFreq { get; set; }
-        public List<int> positions { get; set; }
+        private int termFreq { get; set; }
+        private List<int> positions = new List<int>();
 
-        public posting(int idocID)
+        public posting(int idocID, int iposition)
         {
-            
+            docID = idocID;
+            termFreq = 1;
+            positions.Add(iposition);
         }
-        private string printOut()
+        public void addingTerm(int iposition)
+        {
+            termFreq++;
+            positions.Add(iposition);
+        }
+        public string printOut()
         {
             return "[" + docID + '\t' + termFreq + '\t' + "{" + string.Join(",", positions) + "}" + "]";
         }
