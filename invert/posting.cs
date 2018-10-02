@@ -10,9 +10,9 @@ namespace invert
     {
         public int docID { get; set; }
         public int termFreq { get; set; }
-        public int[] positions { get; set; }
+        public List<int> positions { get; set; }
 
-        public posting()
+        public posting(int idocID)
         {
             
         }

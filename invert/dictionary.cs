@@ -50,14 +50,20 @@ namespace invert
                     }
                 }
             }
+            printOut(d);
+        }
+        /*
+         * 
+         */
+        private void printOut(SortedDictionary<string, int> d)
+        {
             using (StreamWriter file = new StreamWriter("dictionary.txt"))
                 foreach (var entry in d)
                     file.WriteLine(entry.Key + " " + entry.Value);
-
         }
         /* Method dataCleaner
-        * Takes in a sentence and returns an array of only Alphanumeric characters and '-'
-        */
+         * Takes in a sentence and returns an array of only Alphanumeric characters and '-'
+         */
         private string[] dataCleaner(string sentence)
         {
             string[] matchesCollection;
@@ -82,8 +88,6 @@ namespace invert
         {
             string header = headerFlag.Substring(0, 2);
             if (header == ".I") docID++;
-            if (lineNum != 0)  lineNum++; 
-            if (header == ".W") lineNum++;
             if (header == ".K" || header == ".W" || header == ".A" ) { return false; }
             if (header == ".I" || header == ".B" || header == ".X" || header == ".N" || flag == true) { return true; }
             return false;
