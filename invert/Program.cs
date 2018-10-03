@@ -12,14 +12,23 @@ namespace invert
         static void Main(string[] args)
         {
             string fileLocation = AppDomain.CurrentDomain.BaseDirectory + "\\cacm.all";
-            string[] lines = File.ReadAllLines(fileLocation).ToArray();
-            bool stopWords = false, stemming = false ;
-            foreach (var item in args)
+            if (File.Exists(fileLocation))
             {
-                if (item.ToString() == "-stop") stopWords = true;
-                if (item.ToString() == "-stem") stemming = true;
+                string[] lines = File.ReadAllLines(fileLocation).ToArray();
+                bool stopWords = false, stemming = false;
+                foreach (var item in args)
+                {
+                    if (item.ToString() == "-stop") stopWords = true;
+                    if (item.ToString() == "-stem") stemming = true;
+                }
+                dictionary d = new dictionary(lines, stopWords, stemming);
+                Console.WriteLine("Done");
             }
-            dictionary d = new dictionary(lines, stopWords, stemming);
+            else
+            {
+                Console.WriteLine("File cacm.all not found in executable starting folder.");
+                Console.ReadLine();
+            }
         }
     }
 

@@ -26,6 +26,7 @@ namespace invert
 
             if (stopWords) { stopWordList = populateStopWords(); }
 
+            string currentFlag = "";
             for (int i = 0; i < lines.Count(); i++)
             {
                 textBetweenFlags = "";
@@ -35,8 +36,10 @@ namespace invert
                     i++;
                     if (i == lines.Count()) break;
                 }
-                //Increments the ID when it encounters '.I'
+                if (currentFlag != ".W") { textBetweenFlags = ""; }
                 if (i != lines.Count() && lines[i].Substring(0, 2) == ".I") { docID++; }
+                if (i != lines.Count()){ currentFlag = lines[i].Substring(0, 2); }
+
                 if (textBetweenFlags != "")
                 {
                     lineArray = dataCleaner(textBetweenFlags.ToLower());

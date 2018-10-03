@@ -23,9 +23,13 @@ namespace invert
             termFreq++;
             positions.Add(iposition);
         }
-        public string printOut()
+        public string visualPrintOut()
         {
             return "[" + docID + '\t' + termFreq + '\t' + "{" + string.Join(",", positions) + "}" + "]";
+        }
+        public string printOut()
+        {
+            return docID + "\t" + termFreq + "\t" + string.Join(",", positions) + "|";
         }
     }
 }
