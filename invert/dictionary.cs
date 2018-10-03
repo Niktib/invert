@@ -13,14 +13,18 @@ namespace invert
         /* Dictionary class
         * Takes in the documents in an array and outputs the dictionary.txt file with word frequency
         */
-        public dictionary(string[] lines)
+        public dictionary(string[] lines, bool stopWords, bool stemming)
         {
-            int docID = 0, value;
+            int docID = 0;
             string[] lineArray;
             string textBetweenFlags;
+            PorterStemmer ps = new PorterStemmer();
             List<posting> p = new List<posting>();
+            List<string> stopWordList = new List<string>();
             SortedDictionary<string, int> d = new SortedDictionary<string, int>();
             SortedDictionary<string, List<posting>> post = new SortedDictionary<string, List<posting>>();
+
+            if (stopWords) stopWordList = populateStopWords();
 
             for (int i = 0; i < lines.Count(); i++)
             {
@@ -31,34 +35,31 @@ namespace invert
                     i++;
                     if (i == lines.Count()) break;
                 }
-                //Increments the 
+                //Increments the ID when it reads '.I'
                 if (i != lines.Count() && lines[i].Substring(0, 2) == ".I") { docID++; }
                 if (textBetweenFlags != "")
-                { 
+                {
                     lineArray = dataCleaner(textBetweenFlags.ToLower());
                     for (int j = 0; j < lineArray.Count(); j++)
                     {
-                        if (d.TryGetValue(lineArray[j], out value) == true)
+                        string key = lineArray[j];
+                        if (!post.ContainsKey(key))
                         {
-                            d[lineArray[j]] = ++value;
-                            post.TryGetValue(lineArray[j], out p);
-                            if (p.Last().docID == docID)
-                            {
-                                p.Last().addingTerm(j);
-                            }
-                            else
-                            {
-                                p.Add(new posting(docID, j + 1));
-                            }
-                            post[lineArray[j]] = p;
+                            post[key] = new List<posting>();
+                            d[key] = 0;
+                        }
+                        d[key]++;
+                        p = post[key];
+                        posting entry = p.LastOrDefault();
+                        if (entry == null || entry.docID != docID)
+                        {
+                            p.Add(new posting(docID, j + 1));
+                    
                         }
                         else
                         {
-                            d.Add(lineArray[j], 1);
-                            p.Add(new posting(docID, j + 1));
-                            post.Add(lineArray[j], p);
+                            entry.addingTerm(j);
                         }
-                        p = new List<posting>(); //look into this later
                     }
                 }
 
@@ -102,7 +103,7 @@ namespace invert
         private string[] dataCleaner(string sentence)
         {
             string[] matchesCollection;
-            Regex r = new Regex("[A-Za-z-]*"); //"^[A-Za-z0-9-]*"
+            Regex r = new Regex("[A-Za-z-]+"); //"^[A-Za-z0-9-]*"
             if (r.IsMatch(sentence))
             {
                 matchesCollection = new string[r.Matches(sentence).Count];
@@ -113,7 +114,13 @@ namespace invert
             {
                 matchesCollection = new string[0];
             }
-            return matchesCollection = matchesCollection.Where(x => !string.IsNullOrEmpty(x)).ToArray();
+            return matchesCollection;//= matchesCollection.Where(x => !string.IsNullOrEmpty(x)).ToArray();
+        }
+        private List<string> populateStopWords()
+        {
+            List<string> ls = new List<string>();
+
+            return ls;
         }
     }
 }

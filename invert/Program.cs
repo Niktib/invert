@@ -13,7 +13,7 @@ namespace invert
         {
             string fileLocation = AppDomain.CurrentDomain.BaseDirectory + "\\cacm.all";
             string[] lines = File.ReadAllLines(fileLocation).ToArray();
-            dictionary d = new dictionary(lines);
+            dictionary d = new dictionary(lines, false, false);
         }
     }
 
