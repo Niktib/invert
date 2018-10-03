@@ -13,7 +13,13 @@ namespace invert
         {
             string fileLocation = AppDomain.CurrentDomain.BaseDirectory + "\\cacm.all";
             string[] lines = File.ReadAllLines(fileLocation).ToArray();
-            dictionary d = new dictionary(lines, true, true);
+            bool stopWords = false, stemming = false ;
+            foreach (var item in args)
+            {
+                if (item.ToString() == "-stop") stopWords = true;
+                if (item.ToString() == "-stem") stemming = true;
+            }
+            dictionary d = new dictionary(lines, stopWords, stemming);
         }
     }
 
