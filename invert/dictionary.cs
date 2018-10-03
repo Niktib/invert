@@ -32,7 +32,7 @@ namespace invert
                 textBetweenFlags = "";
                 while (!flagCheck(lines[i]))
                 {
-                    textBetweenFlags += lines[i];
+                    textBetweenFlags = textBetweenFlags + " " + lines[i];
                     i++;
                     if (i == lines.Count()) break;
                 }
@@ -42,7 +42,7 @@ namespace invert
 
                 if (textBetweenFlags != "")
                 {
-                    lineArray = dataCleaner(textBetweenFlags.ToLower());
+                    lineArray = dataCleaner(textBetweenFlags.ToLower().Trim());
                     for (int j = 0; j < lineArray.Count(); j++)
                     {
                         string key = lineArray[j];
