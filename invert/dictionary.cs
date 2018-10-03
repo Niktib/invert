@@ -11,7 +11,7 @@ namespace invert
     class dictionary
     {
         /* Dictionary class
-        * Takes in the documents in an array and outputs the dictionary.txt file with word frequency
+        * 
         */
         public dictionary(string[] lines, bool stopWords, bool stemming)
         {
@@ -24,7 +24,7 @@ namespace invert
             SortedDictionary<string, int> d = new SortedDictionary<string, int>();
             SortedDictionary<string, List<posting>> post = new SortedDictionary<string, List<posting>>();
 
-            if (stopWords) stopWordList = populateStopWords();
+            if (stopWords) { stopWordList = populateStopWords(); }
 
             for (int i = 0; i < lines.Count(); i++)
             {
@@ -35,7 +35,7 @@ namespace invert
                     i++;
                     if (i == lines.Count()) break;
                 }
-                //Increments the ID when it reads '.I'
+                //Increments the ID when it encounters '.I'
                 if (i != lines.Count() && lines[i].Substring(0, 2) == ".I") { docID++; }
                 if (textBetweenFlags != "")
                 {
@@ -43,22 +43,25 @@ namespace invert
                     for (int j = 0; j < lineArray.Count(); j++)
                     {
                         string key = lineArray[j];
-                        if (!post.ContainsKey(key))
+                        if (!stopWords || (stopWords && !stopWordList.Contains(key)))
                         {
-                            post[key] = new List<posting>();
-                            d[key] = 0;
-                        }
-                        d[key]++;
-                        p = post[key];
-                        posting entry = p.LastOrDefault();
-                        if (entry == null || entry.docID != docID)
-                        {
-                            p.Add(new posting(docID, j + 1));
-                    
-                        }
-                        else
-                        {
-                            entry.addingTerm(j);
+                            if (stemming) { key = ps.StemWord(key); }
+                            if (!post.ContainsKey(key))
+                            {
+                                post[key] = new List<posting>();
+                                d[key] = 0;
+                            }
+                            d[key]++;
+                            p = post[key];
+                            posting entry = p.LastOrDefault();
+                            if (entry == null || entry.docID != docID)
+                            {
+                                p.Add(new posting(docID, j + 1));
+                            }
+                            else
+                            {
+                                entry.addingTerm(j + 1);
+                            }
                         }
                     }
                 }
@@ -83,9 +86,6 @@ namespace invert
                 }
             }
         }
-        /*
-         * 
-         */
         private void printOutDictionary(SortedDictionary<string, int> d)
         {
             using (StreamWriter file = new StreamWriter("dictionary.txt"))
@@ -97,9 +97,6 @@ namespace invert
             Regex r = new Regex("^.[A-Z]");
             return r.IsMatch(sentence);
         }
-        /* Method dataCleaner
-         * Takes in a sentence and returns an array of only Alphanumeric characters and '-'
-         */
         private string[] dataCleaner(string sentence)
         {
             string[] matchesCollection;
@@ -118,7 +115,8 @@ namespace invert
         }
         private List<string> populateStopWords()
         {
-            List<string> ls = new List<string>();
+            string[] commonWordsArray = File.ReadAllLines(AppDomain.CurrentDomain.BaseDirectory + "\\common_words");
+            List<string> ls = new List<string>(commonWordsArray);
 
             return ls;
         }
