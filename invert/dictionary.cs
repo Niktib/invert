@@ -13,66 +13,108 @@ namespace invert
         /* Dictionary class
         * 
         */
+
+        private List<string> stopWordList;
+        private List<titlesAndAbstracts> titlesAndAbstractsList;
+        private SortedDictionary<string, int> dictionaryMap;
+        private SortedDictionary<string, List<posting>> postMap;
+        
         public dictionary(string[] lines, bool stopWords, bool stemming)
         {
             int docID = 0;
-            string[] lineArray;
-            string textBetweenFlags;
-            PorterStemmer ps = new PorterStemmer();
-            List<posting> p = new List<posting>();
-            List<string> stopWordList = new List<string>();
-            SortedDictionary<string, int> d = new SortedDictionary<string, int>();
-            SortedDictionary<string, List<posting>> post = new SortedDictionary<string, List<posting>>();
+            stopWordList = new List<string>();
+            titlesAndAbstractsList = new List<titlesAndAbstracts>();
+            dictionaryMap = new SortedDictionary<string, int>();
+            postMap = new SortedDictionary<string, List<posting>>();
 
             if (stopWords) { stopWordList = populateStopWords(); }
-
             string currentFlag = "";
+            string textBetweenFlags = "";
+            string currentIDTitle = "";
+
             for (int i = 0; i < lines.Count(); i++)
             {
-                textBetweenFlags = "";
-                while (!flagCheck(lines[i]))
-                {
-                    textBetweenFlags = textBetweenFlags + " " + lines[i];
-                    i++;
-                    if (i == lines.Count()) break;
-                }
-                if (currentFlag != ".W") { textBetweenFlags = ""; }
-                if (i != lines.Count() && lines[i].Substring(0, 2) == ".I") { docID++; }
-                if (i != lines.Count()){ currentFlag = lines[i].Substring(0, 2); }
 
-                if (textBetweenFlags != "")
+                if (flagCheck(lines[i])) { currentFlag = lines[i].Substring(0, 2); }
+                switch (currentFlag)
                 {
-                    lineArray = dataCleaner(textBetweenFlags.ToLower().Trim());
-                    for (int j = 0; j < lineArray.Count(); j++)
-                    {
-                        string key = lineArray[j];
-                        if (!stopWords || (stopWords && !stopWordList.Contains(key)))
+                    case ".I":
+                        if (currentIDTitle != "" && textBetweenFlags != "")
                         {
-                            if (stemming) { key = ps.StemWord(key); }
-                            if (!post.ContainsKey(key))
-                            {
-                                post[key] = new List<posting>();
-                                d[key] = 0;
-                            }
-                            d[key]++;
-                            p = post[key];
-                            posting entry = p.LastOrDefault();
-                            if (entry == null || entry.docID != docID)
-                            {
-                                p.Add(new posting(docID, j + 1));
-                            }
-                            else
-                            {
-                                entry.addingTerm(j + 1);
-                            }
+                            titlesAndAbstractsList.Add(new titlesAndAbstracts(docID, currentIDTitle, textBetweenFlags));
+                            organizeTheLists(docID, textBetweenFlags, stopWords, stemming);
                         }
+                        else if (currentIDTitle != "")
+                        {
+                            titlesAndAbstractsList.Add(new titlesAndAbstracts(docID, currentIDTitle, "No Abstract Provided"));
+                        }
+                        docID++;
+                        textBetweenFlags = "";
+                        currentIDTitle = "";
+                        break;
+                    case ".T":
+                        currentIDTitle = currentIDTitle + " " + lines[i];
+                        break;
+                    case ".W":
+                        i++;
+                        while (!flagCheck(lines[i]))
+                        {
+                            textBetweenFlags = textBetweenFlags + " " + lines[i];
+                            i++;
+                            if (i == lines.Count() || flagCheck(lines[i + 1])) break;
+                        }
+                        currentFlag = lines[i].Substring(0, 2);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            if (currentIDTitle != "" && textBetweenFlags != "")
+            {
+                titlesAndAbstractsList.Add(new titlesAndAbstracts(docID, currentIDTitle, textBetweenFlags));
+                organizeTheLists(docID, textBetweenFlags, stopWords, stemming);
+            }
+            else if (currentIDTitle != "")
+            {
+                titlesAndAbstractsList.Add(new titlesAndAbstracts(docID, currentIDTitle, "No Abstract Provided"));
+            }
+
+            printOutDictionary(dictionaryMap);
+            printOutPostings(postMap);
+            printOutTitlesAndAbstracts(titlesAndAbstractsList);
+        }
+
+        private void organizeTheLists(int docID, string textBetweenFlags, bool stopWords, bool stemming)
+        {
+            List<posting> postingsList = new List<posting>();
+            PorterStemmer ps = new PorterStemmer();
+            string[] lineArray = dataCleaner(textBetweenFlags.ToLower().Trim());
+            for (int j = 0; j < lineArray.Count(); j++)
+            {
+                string key = lineArray[j];
+                if (!stopWords || (stopWords && !stopWordList.Contains(key)))
+                {
+                    if (stemming) { key = ps.StemWord(key); }
+                    if (!postMap.ContainsKey(key))
+                    {
+                        postMap[key] = new List<posting>();
+                        dictionaryMap[key] = 0;
+                    }
+                    dictionaryMap[key]++;
+                    postingsList = postMap[key];
+                    posting entry = postingsList.LastOrDefault();
+                    if (entry == null || entry.docID != docID)
+                    {
+                        postingsList.Add(new posting(docID, j + 1));
+                    }
+                    else
+                    {
+                        entry.addingTerm(j + 1);
                     }
                 }
-
             }
-            printOutDictionary(d);
-            printOutPostings(post);
         }
+
         private void printOutPostings(SortedDictionary<string, List<posting>> post)
         {
             List<posting> p = new List<posting>();
@@ -95,15 +137,21 @@ namespace invert
                 foreach (var entry in d)
                     file.WriteLine(entry.Key + " " + entry.Value);
         }
+        private void printOutTitlesAndAbstracts(List<titlesAndAbstracts> t)
+        {
+            using (StreamWriter file = new StreamWriter("titlesAndAbstracts.txt"))
+                foreach (var entry in t)
+                    file.WriteLine(entry.printOut());
+        }
         private bool flagCheck(string sentence)
         {
-            Regex r = new Regex("^.[A-Z]");
+            Regex r = new Regex("^\\.[A-Z]$|^\\.[I]");
             return r.IsMatch(sentence);
         }
         private string[] dataCleaner(string sentence)
         {
             string[] matchesCollection;
-            Regex r = new Regex("[A-Za-z-]+"); //"^[A-Za-z0-9-]*"
+            Regex r = new Regex("[A-Za-z0-9-]+");
             if (r.IsMatch(sentence))
             {
                 matchesCollection = new string[r.Matches(sentence).Count];
@@ -114,7 +162,7 @@ namespace invert
             {
                 matchesCollection = new string[0];
             }
-            return matchesCollection;//= matchesCollection.Where(x => !string.IsNullOrEmpty(x)).ToArray();
+            return matchesCollection;
         }
         private List<string> populateStopWords()
         {
