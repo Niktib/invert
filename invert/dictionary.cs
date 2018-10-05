@@ -74,10 +74,7 @@ namespace invert
                 titlesAndAbstractsList.Add(new titlesAndAbstracts(docID, currentIDTitle, textBetweenFlags));
                 organizeTheLists(docID, textBetweenFlags, stopWords, stemming);
             }
-            else if (currentIDTitle != "")
-            {
-                titlesAndAbstractsList.Add(new titlesAndAbstracts(docID, currentIDTitle, "No Abstract Provided"));
-            }
+            else if (currentIDTitle != "")  { titlesAndAbstractsList.Add(new titlesAndAbstracts(docID, currentIDTitle, "No Abstract Provided")); }
 
             printOutDictionary(dictionaryMap);
             printOutPostings(postMap);

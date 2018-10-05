@@ -16,7 +16,7 @@ namespace invert
         {
             docID = idocID;
             title = _title.Substring(3).Trim().Replace("\t", "");
-            abstractText = _abstractText;
+            abstractText = _abstractText.Trim().Replace("  ", " ");
         }
         public string visualPrintOut()
         {
