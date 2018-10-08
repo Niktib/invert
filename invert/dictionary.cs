@@ -97,12 +97,12 @@ namespace invert
                         postMap[key] = new List<posting>();
                         dictionaryMap[key] = 0;
                     }
-                    dictionaryMap[key]++;
                     postingsList = postMap[key];
                     posting entry = postingsList.LastOrDefault();
                     if (entry == null || entry.docID != docID)
                     {
                         postingsList.Add(new posting(docID, j + 1));
+                        dictionaryMap[key]++;
                     }
                     else
                     {

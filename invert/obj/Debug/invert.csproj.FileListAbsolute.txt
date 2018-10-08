@@ -4,3 +4,10 @@ C:\Users\Nik\Documents\GitHub\invert\invert\bin\Debug\invert.pdb
 C:\Users\Nik\Documents\GitHub\invert\invert\obj\Debug\invert.csprojResolveAssemblyReference.cache
 C:\Users\Nik\Documents\GitHub\invert\invert\obj\Debug\invert.exe
 C:\Users\Nik\Documents\GitHub\invert\invert\obj\Debug\invert.pdb
+C:\Users\tib-n\Documents\GitHub\invert\invert\bin\Debug\invert.exe.config
+C:\Users\tib-n\Documents\GitHub\invert\invert\bin\Debug\invert.exe
+C:\Users\tib-n\Documents\GitHub\invert\invert\bin\Debug\invert.pdb
+C:\Users\tib-n\Documents\GitHub\invert\invert\obj\Debug\invert.csprojResolveAssemblyReference.cache
+C:\Users\tib-n\Documents\GitHub\invert\invert\obj\Debug\invert.csproj.CoreCompileInputs.cache
+C:\Users\tib-n\Documents\GitHub\invert\invert\obj\Debug\invert.exe
+C:\Users\tib-n\Documents\GitHub\invert\invert\obj\Debug\invert.pdb
