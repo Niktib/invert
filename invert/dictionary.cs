@@ -54,7 +54,7 @@ namespace invert
                         if (abstractText.Length > 3) { abstractText = abstractText.Substring(3); }
                         if (authors.Length > 3) { authors = authors.Substring(3); }
                         titleText = titleText.Substring(3);
-                        organizeTheLists(docID, titleText + " " + abstractText, stopWords, stemming);
+                        organizeTheLists(docID, titleText + " " + abstractText + " " + authors, stopWords, stemming);
 
                         if (abstractText == "") { abstractText = "No Abstract Provided"; }
                         if (authors == "") { authors = "No Authors Provided"; }
